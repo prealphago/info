@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+	<script src="jquery-3.2.1.js"></script>
+	<script>
+		$.when( $.ready ).then(function() {
+			console.log('ready!');
+			$("#myfile").change(function(event){ 
+				var input = event.target;
+				console.log(input);
+				console.log(input.files[0]);
+				var reader = new FileReader();
+				reader.onload = function () {
+					var text = reader.result;
+					console.log('text=' + text);
+					lastJson = JSON.parse(text);
+					console.log('json=', lastJson);
+				}
+				reader.readAsText(input.files[0]);
+			}); 		
+			$('#export').click(function(e){
+				e.preventDefault();
+				exportToJsonFile(lastJson);
+			});
+		});
+		var lastJson; 
+		function vardump(v) {
+			console.log('------------------------------');
+			for(k in v) {
+				console.log('|' + k + ',' + v[k] + '|');
+			}
+			console.log('------------------------------');
+		}
+
+		function exportToJsonFile(jsonData) {
+			var dataStr = JSON.stringify(jsonData);
+			var dataUri = 'data:text/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+			
+			var exportFileDefaultName = 'data.json';
+			
+			var linkElement = document.createElement('a');
+			linkElement.setAttribute('href', dataUri);
+			linkElement.setAttribute('download', exportFileDefaultName);
+			document.body.append(linkElement);
+			linkElement.click();
+		}
+	</script>
+</head>
+<body>
+	<input type="file" id="myfile" /> <br>
+	<input type='button' value='Export' id='export' />
+</body>
+</html>
+
